@@ -197,13 +197,18 @@ class CacheBlk
      * Checks the write permissions of this block.
      * @return True if the block is writable.
      */
+    bool isUnlock() const
+    {
+	bool lock = ((status & Blklocked) != Blklocked);
+	int cur_pid = curTaskPID();
+	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==cur_pid) );
+	return (unlock || the_same_process_lock);
+    }
     bool isWritable() const
     {
         const State needed_bits = BlkWritable | BlkValid;
-	bool unlock = ((status & Blklocked) != Blklocked);
-	int cur_pid = curTaskPID();
-	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==cur_pid) );
-        return ((status & needed_bits) == needed_bits && (unlock || the_same_process_lock));
+	bool unlock = isUnlock();
+        return (((status & needed_bits) == needed_bits) && unlock);
     }
 
     /**
@@ -215,10 +220,8 @@ class CacheBlk
     bool isReadable() const
     {
         const State needed_bits = BlkReadable | BlkValid;
-	bool unlock = ((status & Blklocked) != Blklocked);
-	int cur_pid = curTaskPID();
-	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==cur_pid) );
-        return ((status & needed_bits) == needed_bits && (unlock || the_same_process_lock));
+	bool unlock = isUnlock();
+        return (((status & needed_bits) == needed_bits) && unlock);
     }
 
     /**
