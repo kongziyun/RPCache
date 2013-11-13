@@ -199,7 +199,7 @@ class CacheBlk
      */
     bool isUnlock() const
     {
-	bool lock = ((status & Blklocked) != Blklocked);
+	bool unlock = ((status & Blklocked) != Blklocked);
 	int cur_pid = curTaskPID();
 	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==cur_pid) );
 	return (unlock || the_same_process_lock);

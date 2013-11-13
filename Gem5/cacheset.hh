@@ -98,11 +98,15 @@ CacheSet<Blktype>::findBlk(Addr tag, int& way_id) const
      */
     way_id = assoc;
     for (int i = 0; i < assoc; ++i) {
-	if(!blks[i]->isUnlock())
-		moveToTail(blk[i]);
-        else if (blks[i]->tag == tag && blks[i]->isValid()) {
-            way_id = i;
-            return blks[i];
+        
+	if (blks[i]->tag == tag && blks[i]->isValid()) {
+	    if(blks[i]->isUnlock())
+            {
+		way_id = i;
+                return blks[i];
+	    }
+	    else
+                moveToTail(blks[i]);
         }
     }
     return NULL;
