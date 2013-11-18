@@ -289,7 +289,18 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
 
     int id = pkt->req->hasContextId() ? pkt->req->contextId() : -1;
     blk = tags->accessBlock(pkt->getAddr(), lat, id);
-
+/***************************modified********************************/
+    if(pkt->isLock())
+    {
+	blk->status = blk->status | 0x40;
+	return true;
+    }
+    if(pkt->isUnlock())
+    {
+	blk->status = blk->status & 0x3f;
+	return true;
+    }
+/***************************modified********************************/
     DPRINTF(Cache, "%s%s %x %s %s\n", pkt->cmdString(),
             pkt->req->isInstFetch() ? " (ifetch)" : "",
             pkt->getAddr(), blk ? "hit" : "miss", blk ? blk->print() : "");
@@ -783,7 +794,18 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     Addr blk_addr = blockAlign(pkt->getAddr());
     BlkType *blk = tags->findBlock(pkt->getAddr());
     MSHR *mshr = mshrQueue.findMatch(blk_addr);
-
+/***************************modified********************************/
+    if(pkt->isLock())
+    {
+	blk->status = blk->status | 0x40;
+	return;
+    }
+    if(pkt->isUnlock())
+    {
+	blk->status = blk->status & 0x3f;
+	return;
+    }
+/***************************modified********************************/
     pkt->pushLabel(name());
 
     CacheBlkPrintWrapper cbpw(blk);
