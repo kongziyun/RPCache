@@ -6,18 +6,20 @@ Gem5
 	$ scons build/ARM/gem5.opt
 	For X86: scons build/X86/gem5.opt
 
-2. Run full-system simulation arm on ubuntu:
+2. Run full-system simulation arm/x86 on ubuntu:
 
 	$ cd 
 	$ mkdir full_system_images
 	$ cd ~/full_system_images
-	$ wget http://www.m5sim.org/dist/current/arm/arm-system-2011-08.tar.bz2
-	$ tar jxf arm-system-2011-08.tar.bz2
+  $ wget http://www.m5sim.org/dist/current/x86/x86-system.tar.bz2 
+  $ wget http://www.m5sim.org/dist/current/m5_system_2.0b3.tar.bz2
+  $ tar jvxf x86-system.bar.bz2
+  $ tar jvxf m5_system_2.0b3.tar.bz2
 	$ echo "export M5_PATH=/home/[username]/full_system_images/" >> ~/.bashrc
 	$ source ~/.bashrc
 	
 	$ cd /PATH_TO_GEM5
-	$ build/ARM/gem5.opt configs/example/fs.py --disk-image=/home/[username]/full_system_images/disks/arm-ubuntu-natty-headless.img [--mem-size=256MB]
+  $ ./build/X86/gem5.opt configs/example/fs.py --disk-image=/home/[user_name]/full_system_images/disks/linux-x86.img --kernel=x86_64-vmlinux-2.6.22.9.smp
 
 3. Connect to simulator, open another terminal:
 
@@ -36,8 +38,7 @@ Gem5
 	3). Run program, first line for generating help information
 	
 		$ build/ARM/gem5.opt configs/example/se.py -h 
-		$ build/ARM/gem5.opt configs/example/se.py -c PATH_TO_BINARY_FILE
-
+		$ build/ARM/gem5.opt configs/example/se.py -c PATH_TO_BINARY_FILE -i PATH_TO_INPUT_FILE
 
 5. To use the new pseudo instruction call the function declared in util/m5/m5op.h. 
    Then (cross-)compile your source code with the m5 utilities like:
