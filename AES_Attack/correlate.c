@@ -16,7 +16,8 @@ void readdata(void)
   double deviation;
   double aboveaverage;
   double avdev;
-  for (lines = 0;lines < 8192;++lines) {
+// Changed;
+  for (lines = 0;lines < 512;++lines) {
     if (scanf("%d%d%d%lld%lf%lf%lf%lf"
 	      ,&b
 	      ,&size
@@ -29,7 +30,7 @@ void readdata(void)
 	      ) != 8) exit(100);
     b &= 15;
     j &= 255;
-    if (lines < 4096) {
+    if (lines < 256) {
       t[b][j] = aboveaverage;
       tdev[b][j] = avdev;
     } else {

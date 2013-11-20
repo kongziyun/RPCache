@@ -19,7 +19,7 @@ AES Attack
 
 	$ ./learning [PACKET_SIZE] [NUMBER_OF_PACKETS_ORDER_OF_2] < secretkey > attack.[PACKET_SIZE].[ORDER_OF_2]
 
-5. Analyzing (make sure that the packet sizes of study_stats and attack_stats are the same). P.S: This part is not finished yet.
+5. Analyzing (make sure that the packet sizes of study_stats and attack_stats are the same). 
 
 	$ (tail -256 [STUDY_STATS]; tail -256 [ATTACK_STATS]) | ./correlate >> attack
 	$ cat attack	
