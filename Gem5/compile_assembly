@@ -1,0 +1,5 @@
+1. Compile an assembly: gcc -O2 -S -c test.c
+
+2. See the C code together with assembly it converts to:  gcc -c -g -Wa,-a,-ad [other GCC options] test.c > test.lst
+
+3. There's someway to compile C code with assembly together, but I need some specific code to work with.
