@@ -53,7 +53,6 @@
 #include "base/printable.hh"
 #include "mem/packet.hh"
 #include "mem/request.hh"
-#include "arch/generic/linux/threadinfo.hh"
 #include "sim/core.hh"          // for Tick
 
 /**
@@ -123,7 +122,7 @@ class CacheBlk
     int srcMasterId;
 
     /** holds the process id for this block. **/
-    int pid;
+    uint32_t pid;
 
   protected:
     /**
@@ -169,8 +168,8 @@ class CacheBlk
 
     CacheBlk()
         : asid(-1), tag(0), data(0) ,size(0), status(0), whenReady(0),
-          set(-1), isTouched(false), refCount(0), pid(0)
-          srcMasterId(Request::invldMasterId)
+          set(-1), isTouched(false), refCount(0), 
+          srcMasterId(Request::invldMasterId),pid(0)
     {}
 
     /**
@@ -197,18 +196,16 @@ class CacheBlk
      * Checks the write permissions of this block.
      * @return True if the block is writable.
      */
-    bool isUnlock() const
+    bool isUnlock(uint32_t id) const
     {
 	bool unlock = ((status & Blklocked) != Blklocked);
-	int cur_pid = curTaskPID();
-	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==cur_pid) );
+	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==id) );
 	return (unlock || the_same_process_lock);
     }
     bool isWritable() const
     {
         const State needed_bits = BlkWritable | BlkValid;
-	bool unlock = isUnlock();
-        return (((status & needed_bits) == needed_bits) && unlock);
+        return ((status & needed_bits) == needed_bits);
     }
 
     /**
@@ -220,8 +217,7 @@ class CacheBlk
     bool isReadable() const
     {
         const State needed_bits = BlkReadable | BlkValid;
-	bool unlock = isUnlock();
-        return (((status & needed_bits) == needed_bits) && unlock);
+        return ((status & needed_bits) == needed_bits);
     }
 
     /**

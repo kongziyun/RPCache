@@ -289,7 +289,9 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
 
     int id = pkt->req->hasContextId() ? pkt->req->contextId() : -1;
     blk = tags->accessBlock(pkt->getAddr(), lat, id);
-/***************************modified********************************/
+/***************************modified********************************/  
+    if(!blk->isUnlock(pkt->req->pid()) && blk->isValid())
+	return false;
     if(pkt->isLock())
     {
 	blk->status = blk->status | 0x40;
@@ -326,7 +328,7 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
         if (blk == NULL) {
             // need to do a replacement
             blk = allocateBlock(pkt->getAddr(), writebacks);
-            if (blk == NULL) {
+            if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(pkt->req->pid()))) {
                 // no replaceable block available, give up.
                 // writeback will be forwarded to next level.
                 incMissCount(pkt);
@@ -795,6 +797,8 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     BlkType *blk = tags->findBlock(pkt->getAddr());
     MSHR *mshr = mshrQueue.findMatch(blk_addr);
 /***************************modified********************************/
+    if(!blk->isUnlock(pkt->req->pid()) && blk->isValid())
+	return;
     if(pkt->isLock())
     {
 	blk->status = blk->status | 0x40;
@@ -1183,8 +1187,6 @@ Cache<TagStore>::allocateBlock(Addr addr, PacketList &writebacks)
 {
     BlkType *blk = tags->findVictim(addr, writebacks);
 
-    if (blk->isValid() && !blk->isUnlock())
-	return NULL;
     if (blk->isValid()) {
         Addr repl_addr = tags->regenerateBlkAddr(blk->tag, blk->set);
         MSHR *repl_mshr = mshrQueue.findMatch(repl_addr);
@@ -1232,7 +1234,7 @@ Cache<TagStore>::handleFill(PacketPtr pkt, BlkType *blk,
         assert(pkt->hasData());
         // need to do a replacement
         blk = allocateBlock(addr, writebacks);
-        if (blk == NULL) {
+        if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(pkt->req->pid()))) {
             // No replaceable block... just use temporary storage to
             // complete the current request and then get rid of it
             assert(!tempBlock->isValid());
