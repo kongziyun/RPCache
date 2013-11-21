@@ -26,29 +26,40 @@ unsigned char key[16];
 AES_KEY expanded;
 unsigned char zero[16];
 unsigned char scrambledzero[16];
-
+/*
 unsigned int timestamp(void)
 {
   unsigned int bottom;
   unsigned int top;
   asm volatile(".byte 15;.byte 49" : "=a"(bottom),"=d"(top)); return bottom;
 }
-
+*/
+unsigned int timestamp(){
+  unsigned a, d;
+  asm volatile("rdtsc" : "=a"(a), "=d"(d));
+  return ((unsigned long) a) | (((unsigned long)d)<<32);
+}
 
 void handle(char out[40],char in[],int len) {
   unsigned char workarea[len * 3]; int i;
-  for (i = 0;i < 40;++i) out[i] = 0; *(unsigned int *) (out + 32) = timestamp();
+  for (i = 0;i < 40;++i) out[i] = 0; 
+
+  //*(unsigned int *) (out + 32) = timestamp();
+
   if (len < 16) return;
   i = 0;
 	//for (i = 0;i < 1;++i) 
 	out[i] = in[i];
-  for (i = 16;i < len;++i) workarea[i] = in[i]; 
+  for (i = 16;i < len;++i) workarea[i] = in[i];
+  
+  *(unsigned int *)(out + 32) = timestamp(); 
 	AES_encrypt(in,workarea,&expanded);
   /* a real server would now check AES-based authenticator, */ /* process legitimate packets, and generate useful output */
   i = 0;
-//for (i = 0;i < 1;++i) 
-	out[16 + i] = scrambledzero[i];
+  //for (i = 0;i < 1;++i) 
   *(unsigned int *) (out + 36) = timestamp();
+	out[16 + i] = scrambledzero[i];
+  //*(unsigned int *)(out + 36) = timestamp();
 }
 
 
@@ -76,13 +87,10 @@ void printpatterns(void)
   int b;
   double taverage;
   taverage = ttotal / packets;
-  //for (j = 0;j < 16;++j)
   j = 0;
-  for (b = 0;b < 256;++b) {
-    u[j][b] = t[j][b] / tnum[j][b]; udev[j][b] = tsq[j][b] / tnum[j][b]; udev[j][b] -= u[j][b] * u[j][b]; udev[j][b] = sqrt(udev[j][b]);
-  }
   //for (j = 0;j < 16;++j) {
   for (b = 0;b < 256;++b) {
+    u[j][b] = t[j][b] / tnum[j][b]; udev[j][b] = tsq[j][b] / tnum[j][b]; udev[j][b] -= u[j][b] * u[j][b]; udev[j][b] = sqrt(udev[j][b]);
     printf("%2d %4d %3d %lld %.3f %.3f %.3f %.3f\n" ,j
            ,size
            ,b
@@ -105,9 +113,9 @@ int timetoprint(long long inputs) {
 main(int argc,char **argv) {
   
   if (read(0,key,sizeof key) < sizeof key) return 111; 
-AES_set_encrypt_key(key,128,&expanded); 
-AES_encrypt(zero,scrambledzero,&expanded);
-    int power2=4;
+  AES_set_encrypt_key(key,128,&expanded); 
+  AES_encrypt(zero,scrambledzero,&expanded);
+  int power2=4;
   int j;
   size = atoi(argv[1]);
   char packet[2048];
@@ -117,31 +125,32 @@ AES_encrypt(zero,scrambledzero,&expanded);
   
   // study;
   for (;;){
-  for (;;){
-    if (size < 16) continue;
-    if (size > sizeof packet) continue;
-    for (j = 0; j < size; ++j)
-      packet[j] = random();
-		j = 0;
+    for (;;){
+      if (size < 16) continue;
+      if (size > sizeof packet) continue;
+      for (j = 0; j < size; ++j)
+        packet[j] = random();
+	  	j = 0;
 //    for (j = 0; j < 1; ++j)
       n[j] = packet[j];
-    handle(out,packet,size);
-    unsigned int timing;
-    timing = *(unsigned int *) (out + 36);
-    timing -= *(unsigned int *) (out + 32);
-    if (timing < 10000){
-//	printf("tally\n");
-      tally(timing);break;
+      handle(out,packet,size);
+      unsigned int timing;
+      timing = *(unsigned int *) (out + 36);
+      timing -= *(unsigned int *) (out + 32);
+      
+    //  if (timing < 10000){
+        //printf("tally\n");
+        tally(timing);break;
+      //}
     }
-  }
+  
   ++inputs;
-  if (timetoprint(inputs))
-  {
-//    printpatterns();
-	printf("remove %lld\t%d\n",inputs,++power2);
+  if (timetoprint(inputs)){
+    printpatterns();
+//	  printf("remove %lld\t%d\n",inputs,++power2);
   }
   if (power2 == atoi(argv[2])) {
-	printpatterns();
+	//printpatterns();
 return 1;
 }
   }
