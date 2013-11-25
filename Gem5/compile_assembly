@@ -1,0 +1,16 @@
+1. Compile an assembly: gcc -O2 -S -c test.c
+
+	 or
+
+	 gcc -S -masm=intel test.c (intel style is more readable)
+
+2. See the C code together with assembly it converts to:  gcc -c -g -Wa,-a,-ad [other GCC options] test.c > test.lst
+
+3. There's someway to compile C code with assembly together, but I need some specific code to work with.
+
+4. explanation of the assembly:
+	 line 19 : add DWORD PTR [rbp-4], eax
+		rbp is a register, the memory address is computed by rbp-4
+		this line is converted from test_num += i
+		
+		so we can lock and unlock before and after this line

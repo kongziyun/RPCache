@@ -53,7 +53,7 @@
 #include "mem/cache/tags/lru.hh"
 #include "mem/cache/base.hh"
 #include "sim/core.hh"
-#include "arch/generic/linux/threadinfo.hh"
+
 
 using namespace std;
 
@@ -206,7 +206,7 @@ LRU::insertBlock(PacketPtr pkt, BlkType *blk)
     blk->isTouched = true;
     // Set tag for new block.  Caller is responsible for setting status.
     blk->tag = extractTag(addr);
-    blk->pid = curTaskPID();
+    blk->pid = pkt->req->pid();
     // deal with what we are bringing in
     assert(master_id < cache->system->maxMasters());
     occupancies[master_id]++;
