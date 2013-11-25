@@ -3,27 +3,27 @@ Gem5
 
 1. Build Gem5:
 
-	$ scons build/ARM/gem5.opt
-	For X86: scons build/X86/gem5.opt
+		$ scons build/ARM/gem5.opt
+		For X86: scons build/X86/gem5.opt
 
 2. Run full-system simulation arm/x86 on ubuntu:
 
-	$ cd 
-	$ mkdir full_system_images
-	$ cd ~/full_system_images
-  $ wget http://www.m5sim.org/dist/current/x86/x86-system.tar.bz2 
-  $ wget http://www.m5sim.org/dist/current/m5_system_2.0b3.tar.bz2
-  $ tar jvxf x86-system.bar.bz2
-  $ tar jvxf m5_system_2.0b3.tar.bz2
-	$ echo "export M5_PATH=/home/[username]/full_system_images/" >> ~/.bashrc
-	$ source ~/.bashrc
+		$ cd 
+		$ mkdir full_system_images
+		$ cd ~/full_system_images
+		$ wget http://www.m5sim.org/dist/current/x86/x86-system.tar.bz2 
+		$ wget http://www.m5sim.org/dist/current/m5_system_2.0b3.tar.bz2
+		$ tar jvxf x86-system.bar.bz2
+		$ tar jvxf m5_system_2.0b3.tar.bz2
+		$ echo "export M5_PATH=/home/[username]/full_system_images/" >> ~/.bashrc
+		$ source ~/.bashrc
 	
-	$ cd /PATH_TO_GEM5
-  $ ./build/X86/gem5.opt configs/example/fs.py --disk-image=/home/[user_name]/full_system_images/disks/linux-x86.img --kernel=x86_64-vmlinux-2.6.22.9.smp
+		$ cd /PATH_TO_GEM5
+		$ ./build/X86/gem5.opt configs/example/fs.py --disk-image=/home/[user_name]/full_system_images/disks/linux-x86.img --kernel=x86_64-vmlinux-2.6.22.9.smp
 
 3. Connect to simulator, open another terminal:
 
-	$ telnet localhost 3456
+		$ telnet localhost 3456
 
 4. If you want to run a program without using full-system simulation
 

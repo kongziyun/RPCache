@@ -3,9 +3,9 @@ AES Attack
 
 1. Compiling:
 
-	$ gcc -O3 -o learning learning.c -lcrypto -lm
-	$ gcc -O3 -o correlate correlate.c -lm
-	$ gcc -O3 -o search search.c -lcrypto
+		$ gcc -O3 -o learning learning.c -lcrypto -lm
+		$ gcc -O3 -o correlate correlate.c -lm
+		$ gcc -O3 -o search search.c -lcrypto
 
 2. [AES_Key] could be [/dev/zero] or generate by hardware:
 
