@@ -118,6 +118,7 @@ main(int argc,char **argv) {
   int power2=4;
   int j;
   size = atoi(argv[1]);
+  //size = 16;
   char packet[2048];
   char out[40];
   struct pollfd p;
@@ -150,6 +151,7 @@ main(int argc,char **argv) {
 //	  printf("remove %lld\t%d\n",inputs,++power2);
   }
   if (power2 == atoi(argv[2])) {
+//  if (power2 == 17){
 	//printpatterns();
 return 1;
 }
