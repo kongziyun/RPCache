@@ -217,8 +217,8 @@ class StaticInst : public RefCounted
 
     bool isNop()          const { return flags[IsNop]; }
 
-    bool isMemRef()       const { return flags[IsMemRef]; }
-    bool isLoad()         const { return flags[IsLoad]; }
+    bool isMemRef()       const { return (flags[IsMemRef] || flags[IsLock] || flags[IsUnlock]); }
+    bool isLoad()         const { return (flags[IsLoad] || flags[IsLock] || flags[IsUnlock]); }
     bool isStore()        const { return flags[IsStore]; }
     bool isStoreConditional()     const { return flags[IsStoreConditional]; }
     bool isInstPrefetch() const { return flags[IsInstPrefetch]; }
