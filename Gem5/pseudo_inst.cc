@@ -610,7 +610,7 @@ unlockcacheline(ThreadContext *tc, uint64_t addr)
 void
 setpid(ThreadContext *tc, uint64_t id)
 {
-    DPRINTF(PseudoInst, "PseudoInst::setpid\n");
+  DPRINTF(PseudoInst, "PseudoInst::setpid: %d\n", id);
     global_pid_zheng = id;
     return;
 }
