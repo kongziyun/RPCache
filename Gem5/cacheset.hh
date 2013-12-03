@@ -98,10 +98,9 @@ CacheSet<Blktype>::findBlk(Addr tag, int& way_id) const
      */
     way_id = assoc;
     for (int i = 0; i < assoc; ++i) {
-        
-	if (blks[i]->tag == tag && blks[i]->isValid()) {
-		way_id = i;
-                return blks[i];
+        if (blks[i]->tag == tag && blks[i]->isValid() && blks[i]->isUnlock()) { //modified
+            way_id = i;
+            return blks[i];
         }
     }
     return NULL;

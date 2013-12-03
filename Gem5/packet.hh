@@ -128,10 +128,6 @@ class MemCmd
         PrintReq,       // Print state matching address
         FlushReq,      //request for a cache flush
         InvalidationReq,   // request for address to be invalidated from lsq
-/********************modified*****************************/
-	Lock,
-	Unlock,
-/********************modified*****************************/
         NUM_MEM_CMDS
     };
 
@@ -156,10 +152,6 @@ class MemCmd
         IsError,        //!< Error response
         IsPrint,        //!< Print state matching address (for debugging)
         IsFlush,        //!< Flush the address from caches
-/********************modified*****************************/
-	IsLock,
-	IsUnlock,
-/********************modified*****************************/
         NUM_COMMAND_ATTRIBUTES
     };
 
@@ -207,10 +199,7 @@ class MemCmd
     bool isError() const        { return testCmdAttrib(IsError); }
     bool isPrint() const        { return testCmdAttrib(IsPrint); }
     bool isFlush() const        { return testCmdAttrib(IsFlush); }
-/********************modified*****************************/
-    bool isLock() const		{ return testCmdAttrib(IsLock); }
-    bool isUnlock const		{ return testCmdAttrib(IsUnlock); }
-/********************modified*****************************/
+
     const Command
     responseCommand() const
     {
@@ -282,6 +271,10 @@ class Packet : public Printable
 
     /// A pointer to the original request.
     RequestPtr req;
+
+    bool lock; //modified
+
+    bool unlock;
 
   private:
    /**
@@ -515,10 +508,7 @@ class Packet : public Printable
     bool isError() const        { return cmd.isError(); }
     bool isPrint() const        { return cmd.isPrint(); }
     bool isFlush() const        { return cmd.isFlush(); }
-/********************modified*****************************/
-    bool isLock() const		{ return cmd.isLock(); }
-    bool isUnlock() const	{ return cmd.isUnlock(); }
-/********************modified*****************************/
+
     // Snoop flags
     void assertMemInhibit()     { flags.set(MEM_INHIBIT); }
     bool memInhibitAsserted()   { return flags.isSet(MEM_INHIBIT); }
@@ -628,7 +618,7 @@ class Packet : public Printable
      * req.  this allows for overriding the size/addr of the req.
      */
     Packet(Request *_req, MemCmd _cmd, int _blkSize)
-        :  cmd(_cmd), req(_req), data(NULL),
+        :  cmd(_cmd), req(_req), lock(0), unlock(0), data(NULL),
            src(InvalidPortID), dest(InvalidPortID),
            bytesValidStart(0), bytesValidEnd(0),
            busFirstWordDelay(0), busLastWordDelay(0),

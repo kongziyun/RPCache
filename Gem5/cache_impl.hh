@@ -301,17 +301,14 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
     uint32_t pid = procInfo->pid(stackPtr);
     delete procInfo;
  */
-    if(!blk->isUnlock(global_pid_zheng) && blk->isValid())
-	return false;
-    if(pkt->lock)
-    {
-	blk->status = blk->status | 0x40;
-	blk->pid=global_pid_zheng;
-    }
-    if(pkt->unlock)
-    {
-	blk->status = blk->status & 0x3f;
-    }
+     if(pkt->lock)
+     {
+          blk->status = blk->status | 0x40;
+     }
+     if(pkt->unlock)
+     {
+	 // blk->status = blk->status & 0x3f;
+     }  
 /***************************modified********************************/
     DPRINTF(Cache, "%s%s %x %s %s\n", pkt->cmdString(),
             pkt->req->isInstFetch() ? " (ifetch)" : "",
@@ -338,8 +335,8 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
         if (blk == NULL) {
             // need to do a replacement
             blk = allocateBlock(pkt->getAddr(), writebacks);
-            if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
-//if (blk == NULL) {
+      //      if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
+            if (blk == NULL) {
                 // no replaceable block available, give up.
                 // writeback will be forwarded to next level.
                 incMissCount(pkt);
@@ -814,17 +811,15 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     uint32_t pid = procInfo->pid(stackPtr);
     delete procInfo;
  */
-    if(!blk->isUnlock(global_pid_zheng) && blk->isValid())
-	return;
-    if(pkt->lock)
+  
+  /*  if(pkt->lock)
     {
 	blk->status = blk->status | 0x40;
-	blk->pid=global_pid_zheng;
     }
     if(pkt->unlock)
     {
 	blk->status = blk->status & 0x3f;
-    }
+    }*/
 /***************************modified********************************/
     pkt->pushLabel(name());
 
@@ -1202,7 +1197,9 @@ typename Cache<TagStore>::BlkType*
 Cache<TagStore>::allocateBlock(Addr addr, PacketList &writebacks)
 {
     BlkType *blk = tags->findVictim(addr, writebacks);
-
+	
+    if(blk->isValid() && !blk->isUnlock()) //modified
+	return NULL;
     if (blk->isValid()) {
         Addr repl_addr = tags->regenerateBlkAddr(blk->tag, blk->set);
         MSHR *repl_mshr = mshrQueue.findMatch(repl_addr);
@@ -1257,8 +1254,8 @@ Cache<TagStore>::handleFill(PacketPtr pkt, BlkType *blk,
         assert(pkt->hasData());
         // need to do a replacement
         blk = allocateBlock(addr, writebacks);
-        if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
-        //if (blk == NULL) {
+     //   if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
+        if (blk == NULL) {
             // No replaceable block... just use temporary storage to
             // complete the current request and then get rid of it
             assert(!tempBlock->isValid());

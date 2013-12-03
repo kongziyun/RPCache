@@ -55,6 +55,7 @@
 #include "mem/request.hh"
 #include "sim/core.hh"          // for Tick
 
+extern uint64_t global_pid_zheng;
 /**
  * Cache block status bit assignments
  */
@@ -122,7 +123,7 @@ class CacheBlk
     int srcMasterId;
 
     /** holds the process id for this block. **/
-    uint32_t pid;
+    uint64_t pid;
 
   protected:
     /**
@@ -169,7 +170,7 @@ class CacheBlk
     CacheBlk()
         : asid(-1), tag(0), data(0) ,size(0), status(0), whenReady(0),
           set(-1), isTouched(false), refCount(0), 
-          srcMasterId(Request::invldMasterId),pid(0)
+          srcMasterId(Request::invldMasterId),pid(-1)
     {}
 
     /**
@@ -196,10 +197,16 @@ class CacheBlk
      * Checks the write permissions of this block.
      * @return True if the block is writable.
      */
-    bool isUnlock(uint32_t id) const
+  /*  bool isUnlock(uint32_t id) const
     {
 	bool unlock = ((status & Blklocked) != Blklocked);
 	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==id) );
+	return (unlock || the_same_process_lock);
+    }*/
+    bool isUnlock() const
+    {
+	bool unlock = ((status & Blklocked) != Blklocked);
+	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==global_pid_zheng) );
 	return (unlock || the_same_process_lock);
     }
     bool isWritable() const

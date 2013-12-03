@@ -54,8 +54,8 @@
 #include "mem/cache/base.hh"
 #include "sim/core.hh"
 
-
 using namespace std;
+extern uint64_t global_pid_zheng;
 
 LRU::LRU(const Params *p)
     :BaseTags(p), assoc(p->assoc),
@@ -206,7 +206,7 @@ LRU::insertBlock(PacketPtr pkt, BlkType *blk)
     blk->isTouched = true;
     // Set tag for new block.  Caller is responsible for setting status.
     blk->tag = extractTag(addr);
-    blk->pid = pkt->req->pid();
+    blk->pid = global_pid_zheng; //modified
     // deal with what we are bringing in
     assert(master_id < cache->system->maxMasters());
     occupancies[master_id]++;
