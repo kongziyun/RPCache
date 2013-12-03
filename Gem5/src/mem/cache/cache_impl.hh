@@ -301,21 +301,23 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
     uint32_t pid = procInfo->pid(stackPtr);
     delete procInfo;
  */
-     if(pkt->lock)
-     {
-          blk->status = blk->status | 0x40;
-     }
-     if(pkt->unlock)
-     {
-	 // blk->status = blk->status & 0x3f;
-     }  
+
 /***************************modified********************************/
     DPRINTF(Cache, "%s%s %x %s %s\n", pkt->cmdString(),
             pkt->req->isInstFetch() ? " (ifetch)" : "",
             pkt->getAddr(), blk ? "hit" : "miss", blk ? blk->print() : "");
 
     if (blk != NULL) {
-
+/***************************modified********************************/
+         if(pkt->lock)
+        {
+          blk->status = blk->status | 0x40;
+        }
+        if(pkt->unlock)
+        {
+	  blk->status = blk->status & 0x3f;
+        }  
+/***************************modified********************************/
         if (pkt->needsExclusive() ? blk->isWritable() : blk->isReadable()) {
             // OK to satisfy access
             incHitCount(pkt);
@@ -811,15 +813,17 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     uint32_t pid = procInfo->pid(stackPtr);
     delete procInfo;
  */
-  
-  /*  if(pkt->lock)
+    if(blk != NULL)
     {
-	blk->status = blk->status | 0x40;
+    	if(pkt->lock)
+    	{
+		blk->status = blk->status | 0x40;
+    	}
+    	if(pkt->unlock)
+    	{
+		blk->status = blk->status & 0x3f;
+    	}
     }
-    if(pkt->unlock)
-    {
-	blk->status = blk->status & 0x3f;
-    }*/
 /***************************modified********************************/
     pkt->pushLabel(name());
 
