@@ -204,8 +204,8 @@
                         0x57: unlockcacheline({{
                             PseudoInst::unlockcacheline(xc->tcBase(),Rdi);
                         }}, IsUnlock);
-                        0x58: m5reserved4({{
-                            warn("M5 reserved opcode 4 ignored.\n");
+                        0x58: setpid({{
+                            PseudoInst::setpid(xc->tcBase(),Rdi);
                         }}, IsNonSpeculative);
                         0x59: m5reserved5({{
                             warn("M5 reserved opcode 5 ignored.\n");

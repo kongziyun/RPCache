@@ -48,6 +48,8 @@ class ThreadContext;
 //We need the "Tick" and "Addr" data types from here
 #include "base/types.hh"
 
+
+
 namespace PseudoInst {
 
 /**
@@ -88,6 +90,7 @@ void debugbreak(ThreadContext *tc);
 void switchcpu(ThreadContext *tc);
 void lockcacheline(ThreadContext *tc, uint64_t addr);
 void unlockcacheline(ThreadContext *tc, uint64_t addr);
+void setpid(ThreadContext *tc, uint64_t id);
 void workbegin(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 void workend(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 

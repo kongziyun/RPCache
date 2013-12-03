@@ -73,11 +73,12 @@
 #include "sim/system.hh"
 #include "sim/vptr.hh"
 
+
 using namespace std;
 
 using namespace Stats;
 using namespace TheISA;
-
+uint64_t global_pid_zheng = -1;
 namespace PseudoInst {
 
 static inline void
@@ -597,12 +598,21 @@ switchcpu(ThreadContext *tc)
 void 
 lockcacheline(ThreadContext *tc, uint64_t addr)
 {
+    DPRINTF(PseudoInst, "PseudoInst::lockcacheline\n");
 	return;
 }
 void 
 unlockcacheline(ThreadContext *tc, uint64_t addr)
 {
+    DPRINTF(PseudoInst, "PseudoInst::unlockcacheline\n");
 	return;
+}
+void
+setpid(ThreadContext *tc, uint64_t id)
+{
+    DPRINTF(PseudoInst, "PseudoInst::setpid\n");
+    global_pid_zheng = id;
+    return;
 }
 //
 // This function is executed when annotated work items begin.  Depending on 

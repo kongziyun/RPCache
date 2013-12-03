@@ -61,6 +61,11 @@
 #include "mem/cache/cache.hh"
 #include "mem/cache/mshr.hh"
 #include "sim/sim_exit.hh"
+#include "arch/x86/stacktrace.hh"
+#include "arch/x86/system.hh"
+
+
+extern uint64_t global_pid_zheng;
 
 template<class TagStore>
 Cache<TagStore>::Cache(const Params *p)
@@ -289,18 +294,23 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
 
     int id = pkt->req->hasContextId() ? pkt->req->contextId() : -1;
     blk = tags->accessBlock(pkt->getAddr(), lat, id);
-/***************************modified********************************/  
-    if(!blk->isUnlock(pkt->req->pid()) && blk->isValid())
+/***************************modified********************************/ 
+ /*   ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
+    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
+    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
+    uint32_t pid = procInfo->pid(stackPtr);
+    delete procInfo;
+ */
+    if(!blk->isUnlock(global_pid_zheng) && blk->isValid())
 	return false;
-    if(pkt->isLock())
+    if(pkt->lock)
     {
 	blk->status = blk->status | 0x40;
-	return true;
+	blk->pid=global_pid_zheng;
     }
-    if(pkt->isUnlock())
+    if(pkt->unlock)
     {
 	blk->status = blk->status & 0x3f;
-	return true;
     }
 /***************************modified********************************/
     DPRINTF(Cache, "%s%s %x %s %s\n", pkt->cmdString(),
@@ -328,7 +338,8 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
         if (blk == NULL) {
             // need to do a replacement
             blk = allocateBlock(pkt->getAddr(), writebacks);
-            if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(pkt->req->pid()))) {
+            if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
+//if (blk == NULL) {
                 // no replaceable block available, give up.
                 // writeback will be forwarded to next level.
                 incMissCount(pkt);
@@ -797,17 +808,22 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     BlkType *blk = tags->findBlock(pkt->getAddr());
     MSHR *mshr = mshrQueue.findMatch(blk_addr);
 /***************************modified********************************/
-    if(!blk->isUnlock(pkt->req->pid()) && blk->isValid())
+  /*  ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
+    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
+    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
+    uint32_t pid = procInfo->pid(stackPtr);
+    delete procInfo;
+ */
+    if(!blk->isUnlock(global_pid_zheng) && blk->isValid())
 	return;
-    if(pkt->isLock())
+    if(pkt->lock)
     {
 	blk->status = blk->status | 0x40;
-	return;
+	blk->pid=global_pid_zheng;
     }
-    if(pkt->isUnlock())
+    if(pkt->unlock)
     {
 	blk->status = blk->status & 0x3f;
-	return;
     }
 /***************************modified********************************/
     pkt->pushLabel(name());
@@ -1228,13 +1244,21 @@ Cache<TagStore>::handleFill(PacketPtr pkt, BlkType *blk,
 #if TRACING_ON
     CacheBlk::State old_state = blk ? blk->status : 0;
 #endif
-
+/***************************modified********************************/
+ /*   ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
+    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
+    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
+    uint32_t pid = procInfo->pid(stackPtr);
+    delete procInfo;
+ */
+/***************************modified********************************/
     if (blk == NULL) {
         // better have read new data...
         assert(pkt->hasData());
         // need to do a replacement
         blk = allocateBlock(addr, writebacks);
-        if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(pkt->req->pid()))) {
+        if (blk == NULL || (blk != NULL && blk->isValid() && !blk->isUnlock(global_pid_zheng))) {
+        //if (blk == NULL) {
             // No replaceable block... just use temporary storage to
             // complete the current request and then get rid of it
             assert(!tempBlock->isValid());
