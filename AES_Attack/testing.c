@@ -12,14 +12,20 @@ void main(void){
   char array[20];
   int i,j;
   unsigned int start, end;
-  for (j = 0; j < 2000; ++j){
+
+  for (j = 0; j < 20; ++j){
   for (i = 0; i < 20;++i){
     start = timestamp();
+   if(i < 15)
+      m5_setpid(0);
+   else
+      m5_setpid(1);
     array[i] = '1';
     end = timestamp();
     printf("%d\t%d\ttime in between: %d\n", j , i, end - start);
   }
+m5_unsetpid(0);
+m5_unsetpid(1);
   printf("\n\n");
   }
-
 }
