@@ -598,8 +598,7 @@ LSQUnit<Impl>::read(Request *req, Request *sreqLow, Request *sreqHigh,
     }
 
     // Check the SQ for any previous stores that might lead to forwarding
-    if(!(load_inst->isLock() || load_inst->isUnlock())) //modified
-    {
+
     int store_idx = load_inst->sqIdx;
 
     int store_size = 0;
@@ -773,7 +772,7 @@ LSQUnit<Impl>::read(Request *req, Request *sreqLow, Request *sreqHigh,
             return NoFault;
         }
     }
-}
+
     // If there's no forwarding case, then go access memory
     DPRINTF(LSQUnit, "Doing memory access for inst [sn:%lli] PC %s\n",
             load_inst->seqNum, load_inst->pcState());
@@ -789,10 +788,6 @@ LSQUnit<Impl>::read(Request *req, Request *sreqLow, Request *sreqHigh,
         MemCmd command =
             req->isLLSC() ? MemCmd::LoadLockedReq : MemCmd::ReadReq;
         PacketPtr data_pkt = new Packet(req, command);
-	if(load_inst->isLock())//modified
-		data_pkt->lock = 1;
-	else if(load_inst->isUnlock())
-		data_pkt->unlock = 1;
         PacketPtr fst_data_pkt = NULL;
         PacketPtr snd_data_pkt = NULL;
 

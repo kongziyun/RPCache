@@ -165,8 +165,6 @@ class StaticInst : public RefCounted
         IsMicroBranch,  ///< This microop branches within the microcode for a macroop
         IsDspOp,
         IsSquashAfter, ///< Squash all uncommitted state after executed
-	IsLock,
-	IsUnlock,
         NumFlags
     };
 
@@ -217,8 +215,8 @@ class StaticInst : public RefCounted
 
     bool isNop()          const { return flags[IsNop]; }
 
-    bool isMemRef()       const { return (flags[IsMemRef] || flags[IsLock] || flags[IsUnlock]); }
-    bool isLoad()         const { return (flags[IsLoad] || flags[IsLock] || flags[IsUnlock]); }
+    bool isMemRef()       const { return flags[IsMemRef]; }
+    bool isLoad()         const { return flags[IsLoad]; }
     bool isStore()        const { return flags[IsStore]; }
     bool isStoreConditional()     const { return flags[IsStoreConditional]; }
     bool isInstPrefetch() const { return flags[IsInstPrefetch]; }
@@ -260,8 +258,7 @@ class StaticInst : public RefCounted
     //This flag doesn't do anything yet
     bool isMicroBranch() const { return flags[IsMicroBranch]; }
     //@}
-    bool isLock() const { return flags[IsLock]; }
-    bool isUnlock() const { return flags[IsUnlock]; }
+
 
     void setLastMicroop() { flags[IsLastMicroop] = true; }
     void setDelayedCommit() { flags[IsDelayedCommit] = true; }

@@ -79,6 +79,7 @@ using namespace std;
 using namespace Stats;
 using namespace TheISA;
 uint64_t global_pid_zheng = -1;
+uint64_t global_unset_pid = -1;
 namespace PseudoInst {
 
 static inline void
@@ -595,23 +596,18 @@ switchcpu(ThreadContext *tc)
     exitSimLoop("switchcpu");
 }
 
-void 
-lockcacheline(ThreadContext *tc, uint64_t addr)
-{
-    DPRINTF(PseudoInst, "PseudoInst::lockcacheline\n");
-	return;
-}
-void 
-unlockcacheline(ThreadContext *tc, uint64_t addr)
-{
-    DPRINTF(PseudoInst, "PseudoInst::unlockcacheline\n");
-	return;
-}
 void
 setpid(ThreadContext *tc, uint64_t id)
 {
-  DPRINTF(PseudoInst, "PseudoInst::setpid: %d\n", id);
+    DPRINTF(PseudoInst, "PseudoInst::setpid: %d\n", id);
     global_pid_zheng = id;
+    return;
+}
+void
+unsetpid(ThreadContext *tc, uint64_t id)
+{
+    DPRINTF(PseudoInst, "PseudoInst::unsetpid: %d\n", id);
+    global_unset_pid = id;
     return;
 }
 //

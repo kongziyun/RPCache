@@ -198,14 +198,14 @@
 			0x55: m5reserved1({{
                             warn("M5 reserved opcode 1 ignored.\n");
                         }}, IsNonSpeculative);
-                        0x56: lockcacheline({{
-                            PseudoInst::lockcacheline(xc->tcBase(),Rdi);
-                        }}, IsLock);
-                        0x57: unlockcacheline({{
-                            PseudoInst::unlockcacheline(xc->tcBase(),Rdi);
-                        }}, IsUnlock);
-                        0x58: setpid({{
-                            PseudoInst::setpid(xc->tcBase(),Rdi);
+                        0x56: setpid({{
+                             PseudoInst::setpid(xc->tcBase(),Rdi);
+                        }}, IsNonSpeculative);
+                        0x57: unsetpid({{
+                            PseudoInst::unsetpid(xc->tcBase(),Rdi);
+                        }}, IsNonSpeculative);
+                        0x58: m5reserved4({{
+                             warn("M5 reserved opcode 5 ignored.\n");
                         }}, IsNonSpeculative);
                         0x59: m5reserved5({{
                             warn("M5 reserved opcode 5 ignored.\n");

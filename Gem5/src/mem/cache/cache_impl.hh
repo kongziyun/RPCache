@@ -294,30 +294,13 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
 
     int id = pkt->req->hasContextId() ? pkt->req->contextId() : -1;
     blk = tags->accessBlock(pkt->getAddr(), lat, id);
-/***************************modified********************************/ 
- /*   ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
-    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
-    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
-    uint32_t pid = procInfo->pid(stackPtr);
-    delete procInfo;
- */
 
-/***************************modified********************************/
     DPRINTF(Cache, "%s%s %x %s %s\n", pkt->cmdString(),
             pkt->req->isInstFetch() ? " (ifetch)" : "",
             pkt->getAddr(), blk ? "hit" : "miss", blk ? blk->print() : "");
 
     if (blk != NULL) {
-/***************************modified********************************/
-         if(pkt->lock)
-        {
-          blk->status = blk->status | 0x40;
-        }
-        if(pkt->unlock)
-        {
-	  blk->status = blk->status & 0x3f;
-        }  
-/***************************modified********************************/
+
         if (pkt->needsExclusive() ? blk->isWritable() : blk->isReadable()) {
             // OK to satisfy access
             incHitCount(pkt);
@@ -806,25 +789,7 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     Addr blk_addr = blockAlign(pkt->getAddr());
     BlkType *blk = tags->findBlock(pkt->getAddr());
     MSHR *mshr = mshrQueue.findMatch(blk_addr);
-/***************************modified********************************/
-  /*  ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
-    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
-    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
-    uint32_t pid = procInfo->pid(stackPtr);
-    delete procInfo;
- */
-    if(blk != NULL)
-    {
-    	if(pkt->lock)
-    	{
-		blk->status = blk->status | 0x40;
-    	}
-    	if(pkt->unlock)
-    	{
-		blk->status = blk->status & 0x3f;
-    	}
-    }
-/***************************modified********************************/
+
     pkt->pushLabel(name());
 
     CacheBlkPrintWrapper cbpw(blk);
@@ -1245,14 +1210,7 @@ Cache<TagStore>::handleFill(PacketPtr pkt, BlkType *blk,
 #if TRACING_ON
     CacheBlk::State old_state = blk ? blk->status : 0;
 #endif
-/***************************modified********************************/
- /*   ThreadContext *tc = system->getThreadContext(pkt->req->threadId());
-    Addr stackPtr = tc->readIntReg(X86ISA::INTREG_SP);
-    X86ISA::ProcessInfo *procInfo = new X86ISA::ProcessInfo(tc);
-    uint32_t pid = procInfo->pid(stackPtr);
-    delete procInfo;
- */
-/***************************modified********************************/
+
     if (blk == NULL) {
         // better have read new data...
         assert(pkt->hasData());

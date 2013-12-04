@@ -56,6 +56,7 @@
 #include "sim/core.hh"          // for Tick
 
 extern uint64_t global_pid_zheng;
+extern uint64_t global_unset_pid;
 /**
  * Cache block status bit assignments
  */
@@ -72,8 +73,7 @@ enum CacheBlkStatusBits {
     BlkReferenced =     0x10,
     /** block was a hardware prefetch yet unaccessed*/
     BlkHWPrefetched =   0x20,
-    /** lock status**/
-    Blklocked = 	0x40
+
 };
 
 /**
@@ -205,10 +205,10 @@ class CacheBlk
     }*/
     bool isUnlock() const
     {
-	bool unlock = ((status & Blklocked) != Blklocked);
-	bool the_same_process_lock = (((status & Blklocked) == Blklocked) && (pid ==global_pid_zheng) );
-	return (unlock || the_same_process_lock);
+	bool unlock = (pid ==global_pid_zheng) || (pid == -1) || (pid == global_unset_pid);
+	return unlock;
     }
+
     bool isWritable() const
     {
         const State needed_bits = BlkWritable | BlkValid;

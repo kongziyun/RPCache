@@ -88,9 +88,8 @@ void dumpresetstats(ThreadContext *tc, Tick delay, Tick period);
 void m5checkpoint(ThreadContext *tc, Tick delay, Tick period);
 void debugbreak(ThreadContext *tc);
 void switchcpu(ThreadContext *tc);
-void lockcacheline(ThreadContext *tc, uint64_t addr);
-void unlockcacheline(ThreadContext *tc, uint64_t addr);
 void setpid(ThreadContext *tc, uint64_t id);
+void unsetpid(ThreadContext *tc, uint64_t id);
 void workbegin(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 void workend(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 

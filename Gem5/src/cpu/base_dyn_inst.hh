@@ -546,8 +546,7 @@ class BaseDynInst : public RefCounted
     bool isLastMicroop() const { return staticInst->isLastMicroop(); }
     bool isFirstMicroop() const { return staticInst->isFirstMicroop(); }
     bool isMicroBranch() const { return staticInst->isMicroBranch(); }
-    bool isLock() const { return staticInst->isLock(); }
-    bool isUnlock() const { return staticInst->isUnlock(); }
+
     /** Temporarily sets this instruction as a serialize before instruction. */
     void setSerializeBefore() { status.set(SerializeBefore); }
 

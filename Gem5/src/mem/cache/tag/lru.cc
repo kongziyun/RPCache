@@ -56,6 +56,7 @@
 
 using namespace std;
 extern uint64_t global_pid_zheng;
+extern uint64_t global_unset_pid;
 
 LRU::LRU(const Params *p)
     :BaseTags(p), assoc(p->assoc),
@@ -143,8 +144,13 @@ LRU::accessBlock(Addr addr, Cycles &lat, int master_id)
             lat = cache->ticksToCycles(blk->whenReady - curTick());
         }
         blk->refCount += 1;
-    }
 
+    }
+    if(global_unset_pid != -1)//modified
+    {
+	unlockcache(global_unset_pid);
+        global_unset_pid = -1;
+    }
     return blk;
 }
 
@@ -172,6 +178,23 @@ LRU::findVictim(Addr addr, PacketList &writebacks)
     return blk;
 }
 
+void
+LRU::unlockcache(uint64_t id)//modified
+{
+    unsigned blkIndex = 0;       // index into blks array
+    for (unsigned i = 0; i < numSets; ++i) {
+        // link in the data blocks
+        for (unsigned j = 0; j < assoc; ++j) {
+            // locate next cache block
+            BlkType *blk = &blks[blkIndex];
+	    if(blk->pid == id)
+	    {
+	        blk->pid = -1;
+	    }
+            ++blkIndex;
+        }
+    }
+}
 void
 LRU::insertBlock(PacketPtr pkt, BlkType *blk)
 {

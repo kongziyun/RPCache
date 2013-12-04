@@ -272,9 +272,6 @@ class Packet : public Printable
     /// A pointer to the original request.
     RequestPtr req;
 
-    bool lock; //modified
-
-    bool unlock;
 
   private:
    /**
@@ -618,7 +615,7 @@ class Packet : public Printable
      * req.  this allows for overriding the size/addr of the req.
      */
     Packet(Request *_req, MemCmd _cmd, int _blkSize)
-        :  cmd(_cmd), req(_req), lock(0), unlock(0), data(NULL),
+        :  cmd(_cmd), req(_req), data(NULL),
            src(InvalidPortID), dest(InvalidPortID),
            bytesValidStart(0), bytesValidEnd(0),
            busFirstWordDelay(0), busLastWordDelay(0),
