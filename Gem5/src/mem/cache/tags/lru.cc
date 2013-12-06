@@ -180,7 +180,7 @@ LRU::findVictim(Addr addr, PacketList &writebacks)
 }
 
 void
-LRU::unlockcache(uint64_t id)//modified
+LRU::unlockcache(int32_t id)//modified
 {
     unsigned blkIndex = 0;       // index into blks array
     for (unsigned i = 0; i < numSets; ++i) {
