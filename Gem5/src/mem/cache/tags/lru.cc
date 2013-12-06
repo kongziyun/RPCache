@@ -170,7 +170,8 @@ LRU::findVictim(Addr addr, PacketList &writebacks)
     unsigned set = extractSet(addr);
     // grab a replacement candidate
     BlkType *blk = sets[set].blks[assoc-1];
-
+    if(!blk->isUnlock())
+    	sets[set].moveToTail(blk);
     if (blk->isValid()) {
         DPRINTF(CacheRepl, "set %x: selecting blk %x for replacement\n",
                 set, regenerateBlkAddr(blk->tag, set));
