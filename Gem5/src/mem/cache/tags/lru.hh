@@ -176,7 +176,7 @@ public:
      * @param blk The block to update.
      */
      void insertBlock(PacketPtr pkt, BlkType *blk);
-     void unlockcache(uint64_t id);
+     void unlockcache(int32_t id);
     /**
      * Generate the tag from the given address.
      * @param addr The address to get the tag from.
