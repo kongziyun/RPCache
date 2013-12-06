@@ -102,8 +102,6 @@ CacheSet<Blktype>::findBlk(Addr tag, int& way_id) const
             way_id = i;
             return blks[i];
         }
-        if(!blks[i]->isUnlock())
-            moveToTail(blk);
     }
     return NULL;
 }
