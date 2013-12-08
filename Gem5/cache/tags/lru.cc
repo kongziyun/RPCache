@@ -151,7 +151,7 @@ LRU::accessBlock(Addr addr, Cycles &lat, int master_id, bool isIcache)
             lat = cache->ticksToCycles(blk->whenReady - curTick());
         }
         blk->refCount += 1;
-	if(!isIcache && blk->pid == -1 && global_pid_zheng != -1){
+	if(!isIcache && blk->pid == -1 && global_pid_zheng != -1 && (blk->whenReady <= curTick()||cache->ticksToCycles(blk->whenReady - curTick()) <= hitLatency)){
 	  DPRINTF(ChangePid, "Hit: From %d\tto %d\n", blk->pid, global_pid_zheng);
 	  blk->pid = global_pid_zheng;
 	  //return NULL;
