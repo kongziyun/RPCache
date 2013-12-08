@@ -1,4 +1,5 @@
 #include <netinet/in.h>
+#include <stdint.h>
 #include <openssl/aes.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -11,6 +12,7 @@
 #include <poll.h>
 #include <string.h>
 #include <stdio.h>
+#include "rdtsc.h"
 #include <math.h>
 double packets;
 double ttotal;
@@ -22,6 +24,8 @@ double udev[16][256];
 char n[16];
 int s;
 int size;
+uint64_t lock = 1;
+uint64_t unlock = 0;
 unsigned char key[16];
 AES_KEY expanded;
 unsigned char zero[16];
@@ -34,15 +38,20 @@ unsigned int timestamp(void)
   asm volatile(".byte 15;.byte 49" : "=a"(bottom),"=d"(top)); return bottom;
 }
 */
+/*
 unsigned int timestamp(){
   unsigned a, d;
   asm volatile("rdtsc" : "=a"(a), "=d"(d));
   return ((unsigned long) a) | (((unsigned long)d)<<32);
 }
 
-void handle(char out[40],char in[],int len) {
+*/
+
+#define timestamp() rdtsc()
+
+void handle(char out[48],char in[],int len) {
   unsigned char workarea[len * 3]; int i;
-  for (i = 0;i < 40;++i) out[i] = 0; 
+  for (i = 0;i < 48;++i) out[i] = 0; 
 
   //*(unsigned int *) (out + 32) = timestamp();
 
@@ -51,13 +60,14 @@ void handle(char out[40],char in[],int len) {
 	//for (i = 0;i < 1;++i) 
 	out[i] = in[i];
   for (i = 16;i < len;++i) workarea[i] = in[i];
-  m5_setpid(1);
-  *(unsigned int *)(out + 32) = timestamp(); 
+  m5_setpid(lock);
+  *(unsigned long long *)(out + 32) = rdtsc(); 
 	AES_encrypt(in,workarea,&expanded);
   /* a real server would now check AES-based authenticator, */ /* process legitimate packets, and generate useful output */
   //for (i = 0;i < 1;++i) 
-  *(unsigned int *) (out + 36) = timestamp();
-  m5_setpid(-1);
+  *(unsigned long long *) (out + 40) = rdtsc();
+  m5_setpid(unlock);
+//  m5_unsetpid(1);
   i = 0;
 	out[16 + i] = scrambledzero[i];
   //*(unsigned int *)(out + 36) = timestamp();
@@ -68,7 +78,7 @@ struct sockaddr_in server;
 struct sockaddr_in client; socklen_t clientlen; int s;
 char in[1537];
 int r;
-char out[40];
+char out[46];
 
 void tally(double timing) {
   int j;
@@ -115,15 +125,16 @@ main(int argc,char **argv) {
   
   if (read(0,key,sizeof key) < sizeof key) return 111; 
   AES_set_encrypt_key(key,128,&expanded); 
-  m5_setpid(1);
+  m5_setpid(lock);
   AES_encrypt(zero,scrambledzero,&expanded);
-  m5_setpid(-1);
+  m5_setpid(unlock);
+  //m5_unsetpid(1);
   int power2=4;
   int j;
   //size = atoi(argv[1]);
   size = 16;
   char packet[2048];
-  char out[40];
+  char out[48];
   struct pollfd p;
   long long inputs = 0;
   
@@ -139,13 +150,13 @@ main(int argc,char **argv) {
       n[j] = packet[j];
       handle(out,packet,size);
       unsigned int timing;
-      timing = *(unsigned int *) (out + 36);
-      timing -= *(unsigned int *) (out + 32);
+      timing = *(unsigned long long *) (out + 40);
+      timing -= *(unsigned long long *) (out + 32);
       
-      if (timing < 10000){
+//      if (timing < 10000){
         //printf("tally\n");
         tally(timing);break;
-      }
+  //    }
     }
   
   ++inputs;
