@@ -299,7 +299,7 @@ Cache<TagStore>::access(PacketPtr pkt, BlkType *&blk,
             pkt->req->isInstFetch() ? " (ifetch)" : "",
             pkt->getAddr(), blk ? "hit" : "miss", blk ? blk->print() : "");
 
-    if (blk != NULL) {
+    if (blk != NULL && blk->isUnlock()) { //modified
 
         if (pkt->needsExclusive() ? blk->isWritable() : blk->isReadable()) {
             // OK to satisfy access
@@ -800,7 +800,7 @@ Cache<TagStore>::functionalAccess(PacketPtr pkt, bool fromCpuSide)
     // we have it, but only declare it satisfied if we are the owner.
 
     // see if we have data at all (owned or otherwise)
-    bool have_data = blk && blk->isValid()
+    bool have_data = blk && blk->isValid() && blk->isUnlock() //modified
         && pkt->checkFunctional(&cbpw, blk_addr, blkSize, blk->data);
 
     // data we have is dirty if marked as such or if valid & ownership
