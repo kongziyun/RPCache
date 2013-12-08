@@ -141,7 +141,7 @@ LRU::accessBlock(Addr addr, Cycles &lat, int master_id, bool isIcache)
     unsigned set = extractSet(addr);
     BlkType *blk = sets[set].findBlk(tag);
     lat = hitLatency;
-    if (blk != NULL) {
+    if (blk != NULL && blk->isUnlock()) {
         // move this block to head of the MRU list
         sets[set].moveToHead(blk);
         DPRINTF(CacheRepl, "set %x: moving blk %x to MRU\n",
@@ -158,7 +158,11 @@ LRU::accessBlock(Addr addr, Cycles &lat, int master_id, bool isIcache)
 	
 	}
     }
-
+    if(blk != NULL && !blk->isUnlock())
+    {
+         sets[set].moveToHead(blk);
+	 return NULL;
+    }	
     return blk;
 }
 
