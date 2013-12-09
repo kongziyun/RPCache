@@ -14,52 +14,23 @@ void main(void){
   char arrayB[64];
   int i,j;
   unsigned long long start, end;
-  //arrayB[32]='d';
+
   printf("%ld\n", sizeof(unsigned long long));
-  m5_setpid(1);
-
-  for (i = 0; i < 64; ++i)
-    arrayA[i] = '1';
-
-  m5_setpid(0);
-  for (i = 0; i < 64; ++i)
-  {
-    m5_setpid(1);
-    start = rdtsc();
-    arrayA[i] = '1';
-    end = rdtsc();
+ for (i = 0; i < 64; ++i)
+  {   
+    m5_setpid(1); 
+    arrayA[i] = 1;
     m5_setpid(0);
-    printf("A: %d\ttime:%lld\n", i, end - start);
-
-    start = rdtsc();
-    arrayB[i] = '1';
-    end = rdtsc();
-    printf("B: %d\ttime:%lld\n\n", i, end - start);
-
- }
-
-  printf("sddd\n");
-   for (j = 0; j < 3; ++j)
-  for (i = 0; i < 64;++i){
-   
-     start = rdtsc();
-      arrayB[i] = '4';
-      end = rdtsc();
-      printf("%d\t B\ttime in between: %lld\n", i, end - start);
   }
 
-  printf("sdfsdf\n\n");
- m5_unsetpid(1);  
-  for (j = 0; j < 3; ++j)
-  for (i = 0; i < 64;++i){
-   
-     start = rdtsc();
-      arrayB[i] = '4';
-      end = rdtsc();
-      printf("%d\t B\ttime in between: %lld\n", i, end - start);
+ for (j = 0; j < 64;++j){
+    for (i = 0; i < 64; ++i){
+      start = rdtsc();
+      arrayB[i] = 2;
+      start = rdtsc() - start;
+      printf("%d %d\ttime:%lld\n",i,j, start);
+    }
+    printf("\n");
   }
-
-
-
  
 }
